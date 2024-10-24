@@ -42,14 +42,14 @@ export async function obterCoordenadasPorCEP(
       `https://viacep.com.br/ws/${cep}/json/`
     );
     const dados = respostaViaCEP.data;
-
+    
     // EXEMPLO: 
     // cep: '55014-490',
     // logradouro: 'Rua São Rafael',
     // complemento: '',
     // unidade: '',
-    // bairro: 'Nova Caruaru',
-    // localidade: 'Caruaru',
+    // bairro: aru',
+    // localidade: 'Caruaru''Nova Caru,
     // uf: 'PE',
     // estado: 'Pernambuco',
     // regiao: 'Nordeste',
@@ -58,22 +58,21 @@ export async function obterCoordenadasPorCEP(
     // ddd: '81',
     // siafi: '2381'
 
-    if (!dados.ibge) {
-      logger.warn(`CEP informado não contém o código IBGE: ${cep}`);
-      throw new AppError(
-        "O CEP informado não contém o código IBGE. Verifique se o CEP é válido.",
-        400
-      );
+    if (!dados.logradouro || !dados.localidade || !dados.uf) {
+      logger.warn(`Informações insuficientes retornadas para o CEP: ${cep}`);
+      throw new AppError("Não foi possível encontrar o endereço completo para o CEP informado.", 400);
     }
+    
 
-    const endereco = `${dados.logradouro}, ${dados.bairro}, ${dados.localidade} - ${dados.uf} CEP: ${dados.cep}`;
-    logger.info(`Buscando lojas próximas ao endereço: ${endereco}`);
+    const enderecoCompleto = `${dados.logradouro}, ${dados.bairro}, ${dados.localidade}, ${dados.uf}, Brasil`;
+    logger.info(`Buscando coordenadas para o endereço: ${enderecoCompleto}`);
 
-    const response = await axios.get<GeocodingResponse>(
+
+    let response = await axios.get<GeocodingResponse>(
       "https://api.opencagedata.com/geocode/v1/json",
       {
         params: {
-          q: dados.ibge, // q = query
+          q: enderecoCompleto, // q = query
           key: API_KEY,
           countrycode: "br",
           limit: 1, // Limitar a 1 resultado
@@ -81,12 +80,27 @@ export async function obterCoordenadasPorCEP(
       }
     );
 
+    // as vezes a api do opencage não consegue localizar pela rua e número, então tentamos com cidade e bairro
     if (response.data.results.length === 0) {
-      logger.error(`Nenhuma coordenada encontrada para o CEP: ${cep}`);
-      throw new AppError(
-        "Nenhuma coordenada encontrada para o CEP informado.",
-        404
+      logger.warn(`Nenhuma coordenada exata encontrada, tentando busca com cidade e bairro: ${dados.localidade}, ${dados.bairro}, ${dados.uf}`);
+      const enderecoSimplificado = `${dados.bairro}, ${dados.localidade}, ${dados.uf}, Brasil`;
+
+      response = await axios.get<GeocodingResponse>(
+        "https://api.opencagedata.com/geocode/v1/json",
+        {
+          params: {
+            q: enderecoSimplificado,
+            key: API_KEY,
+            countrycode: "br",
+            limit: 1,
+          },
+        }
       );
+
+      if (response.data.results.length === 0) {
+        logger.error(`Nenhuma coordenada encontrada para o endereço simplificado: ${enderecoSimplificado}`);
+        throw new AppError("Nenhuma coordenada encontrada para o endereço informado.", 404);
+      }
     }
 
     const { lat, lng } = response.data.results[0].geometry;
