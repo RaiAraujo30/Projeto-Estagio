@@ -54,7 +54,7 @@ export const lojaService = {
     } catch (error: any) {
 
       logger.error(`Erro ao buscar lojas por CEP: ${cep}. Detalhes: ${error.message || error}`);
-      return `Erro ao buscar lojas por CEP. Por favor, tente novamente mais tarde.`;
+      return `Erro ao buscar lojas por CEP. Por favor, tente novamente.`;
     }
   }
 
