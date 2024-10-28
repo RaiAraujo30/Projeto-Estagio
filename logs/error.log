@@ -43,3 +43,4 @@
 2024-10-24T11:25:42.991Z [ERROR]: Erro ao buscar lojas por CEP: 19905152. Detalhes: Nenhuma coordenada encontrada para o endereço informado.
 2024-10-24T11:27:45.326Z [ERROR]: Nenhuma coordenada encontrada para o endereço: Rua Padre Rui Cândido da Silva, Vila Odilon, Ourinhos, SP, Brasil
 2024-10-24T11:27:45.327Z [ERROR]: Erro ao buscar lojas por CEP: 19905-152. Detalhes: Nenhuma coordenada encontrada para o endereço informado.
+2024-10-28T11:33:43.864Z [ERROR]: Erro ao conectar ao MongoDB:
