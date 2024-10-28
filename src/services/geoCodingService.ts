@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse }  from "axios";
 import logger from "./loggerService";
 import AppError from "../utils/AppError";
 import dotenv from "dotenv";
@@ -34,86 +34,73 @@ interface Coordenadas {
   longitude: number;
 }
 
-export async function obterCoordenadasPorCEP(
-  cep: string
-): Promise<Coordenadas> {
+async function buscarEnderecoViaCep(cep: string): Promise<ViaCepResponse> {
+  const { data }: AxiosResponse<ViaCepResponse> = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+  
+  if (!data.logradouro || !data.localidade || !data.uf) {
+    logger.warn(`Informações insuficientes retornadas para o CEP: ${cep}`);
+    throw new AppError("Não foi possível encontrar o endereço completo para o CEP informado.", 400);
+  }
+
+  return data;
+}
+// EXEMPLO: 
+// cep: '55014-490',
+// logradouro: 'Rua São Rafael',
+// complemento: '',
+// unidade: '',
+// bairro: aru',
+// localidade: 'Caruaru''Nova Caru,
+// uf: 'PE',
+// estado: 'Pernambuco',
+// regiao: 'Nordeste',
+// ibge: '2604106',
+// gia: '',
+// ddd: '81',
+// siafi: '2381'
+
+    
+
+
+
+async function buscarCoordenadas(endereco: string): Promise<GeocodingResponse> {
+  const { data }: AxiosResponse<GeocodingResponse> = await axios.get("https://api.opencagedata.com/geocode/v1/json", {
+    params: {
+      q: endereco,
+      key: API_KEY,
+      countrycode: "br",
+      limit: 1,
+    },
+  });
+
+  return data;
+}
+export async function obterCoordenadasPorCEP(cep: string): Promise<Coordenadas> {
   try {
-    const respostaViaCEP = await axios.get<ViaCepResponse>(
-      `https://viacep.com.br/ws/${cep}/json/`
-    );
-    const dados = respostaViaCEP.data;
-    
-    // EXEMPLO: 
-    // cep: '55014-490',
-    // logradouro: 'Rua São Rafael',
-    // complemento: '',
-    // unidade: '',
-    // bairro: aru',
-    // localidade: 'Caruaru''Nova Caru,
-    // uf: 'PE',
-    // estado: 'Pernambuco',
-    // regiao: 'Nordeste',
-    // ibge: '2604106',
-    // gia: '',
-    // ddd: '81',
-    // siafi: '2381'
-
-    if (!dados.logradouro || !dados.localidade || !dados.uf) {
-      logger.warn(`Informações insuficientes retornadas para o CEP: ${cep}`);
-      throw new AppError("Não foi possível encontrar o endereço completo para o CEP informado.", 400);
-    }
-    
-
+    const dados = await buscarEnderecoViaCep(cep);
     const enderecoCompleto = `${dados.logradouro}, ${dados.bairro}, ${dados.localidade}, ${dados.uf}, Brasil`;
+
     logger.info(`Buscando coordenadas para o endereço: ${enderecoCompleto}`);
+    let response = await buscarCoordenadas(enderecoCompleto);
 
+    if (response.results.length === 0) {
+        const enderecoSimplificado = `${dados.bairro}, ${dados.localidade}, ${dados.uf}, Brasil`;
+        logger.warn(`Nenhuma coordenada exata encontrada, tentando busca com cidade e bairro: ${enderecoSimplificado}`);
 
-    let response = await axios.get<GeocodingResponse>(
-      "https://api.opencagedata.com/geocode/v1/json",
-      {
-        params: {
-          q: enderecoCompleto, // q = query
-          key: API_KEY,
-          countrycode: "br",
-          limit: 1, // Limitar a 1 resultado
-        },
-      }
-    );
+      response = await buscarCoordenadas(enderecoSimplificado);
 
-    // as vezes a api do opencage não consegue localizar pela rua e número, então tentamos com cidade e bairro
-    if (response.data.results.length === 0) {
-      logger.warn(`Nenhuma coordenada exata encontrada, tentando busca com cidade e bairro: ${dados.localidade}, ${dados.bairro}, ${dados.uf}`);
-      const enderecoSimplificado = `${dados.bairro}, ${dados.localidade}, ${dados.uf}, Brasil`;
-
-      response = await axios.get<GeocodingResponse>(
-        "https://api.opencagedata.com/geocode/v1/json",
-        {
-          params: {
-            q: enderecoSimplificado,
-            key: API_KEY,
-            countrycode: "br",
-            limit: 1,
-          },
-        }
-      );
-
-      if (response.data.results.length === 0) {
+      if (response.results.length === 0) {
         logger.error(`Nenhuma coordenada encontrada para o endereço simplificado: ${enderecoSimplificado}`);
         throw new AppError("Nenhuma coordenada encontrada para o endereço informado.", 404);
       }
     }
 
-    const { lat, lng } = response.data.results[0].geometry;
+    const { lat, lng } = response.results[0].geometry;
     return { latitude: lat, longitude: lng };
   } catch (error: any) {
-    
-    if (error instanceof AppError) {
-      throw error; 
-    }
+    if (error instanceof AppError) throw error;
 
-    throw new AppError(
-      "Falha ao obter coordenadas. Por favor, tente novamente mais tarde.",
-      500
-    );
+    logger.error(`Erro ao obter coordenadas para o CEP: ${cep} - ${error.message}`);
+    throw new AppError("Falha ao obter coordenadas. Por favor, tente novamente.", 500);
   }
 }
