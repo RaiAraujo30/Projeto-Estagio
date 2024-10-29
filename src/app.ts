@@ -1,9 +1,9 @@
-import express, { Application } from 'express';
-import dotenv from 'dotenv';
-import routes from './routes'
-import connectDB from './db/database';
-import logger from './services/loggerService';
-import errorController from './controllers/errorController'; // Importar o errorController
+import express, { Application } from "express";
+import dotenv from "dotenv";
+import routes from "./routes";
+import connectDB from "./db/database";
+import logger from "./utils/logger";
+import errorController from "./controllers/errorController"; // Importar o errorController
 
 //Carrega variáveis do .env
 dotenv.config();
@@ -16,7 +16,7 @@ const port: string | number = process.env.PORT || 3000;
 // Middleware para parsing de JSON
 app.use(express.json());
 
-app.use('/api', routes);
+app.use("/api", routes);
 
 app.use(errorController);
 

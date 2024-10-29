@@ -48,3 +48,5 @@
 2024-10-28T18:24:12.946Z [ERROR]: Erro ao buscar lojas por CEP: 19905-192. Detalhes: Não foi possível encontrar o endereço completo para o CEP informado.
 2024-10-28T18:25:07.030Z [ERROR]: Erro ao buscar lojas por CEP: 19905-192. Detalhes: Não foi possível encontrar o endereço completo para o CEP informado.
 2024-10-28T18:26:59.313Z [ERROR]: Erro ao buscar lojas por CEP: 13065-335. Detalhes: Não foi possível encontrar o endereço completo para o CEP informado.
+2024-10-29T12:09:38.616Z [ERROR]: Erro ao conectar ao MongoDB:
+2024-10-29T12:11:44.246Z [ERROR]: Erro ao buscar lojas por CEP: 13065-335. Detalhes: Não foi possível encontrar o endereço completo para o CEP informado.

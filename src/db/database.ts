@@ -1,15 +1,18 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import logger from '../services/loggerService';
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import logger from "../utils/logger";
 
 dotenv.config();
 
 const connectDB = async (): Promise<void> => {
   try {
     await mongoose.connect(process.env.MONGO_URI as string);
-    logger.info('Conectado ao MongoDB');
+    logger.info("Conectado ao MongoDB");
   } catch (error) {
-    logger.error('Erro ao conectar ao MongoDB:', (error as Error).message || error);
+    logger.error(
+      "Erro ao conectar ao MongoDB:",
+      (error as Error).message || error
+    );
     process.exit(1); // Vai finalizar em caso de erro
   }
 };
