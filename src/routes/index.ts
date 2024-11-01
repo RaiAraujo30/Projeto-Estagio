@@ -1,5 +1,5 @@
 import express from 'express';
-import * as lojaController from '../controllers/lojaController';
+import * as storeController from '../controllers/storeController';
 
 const router = express.Router();
 
@@ -27,7 +27,7 @@ const router = express.Router();
  *       404:
  *         description: Nenhuma loja encontrada para o CEP fornecido
  */
-router.get('/lojas/buscar/:cep', lojaController.buscarLojasPorCEP);
+router.get('/lojas/buscar/:cep', storeController.findStoresByCEP);
 
 /**
  * @swagger
@@ -44,7 +44,7 @@ router.get('/lojas/buscar/:cep', lojaController.buscarLojasPorCEP);
  *               items:
  *                 type: object
  */
-router.get('/lojas', lojaController.listarLojas);
+router.get('/lojas', storeController.listStores);
 
 /**
  * @swagger
@@ -68,7 +68,7 @@ router.get('/lojas', lojaController.listarLojas);
  *       404:
  *         description: Loja não encontrada
  */
-router.get('/lojas/:id', lojaController.buscarLojaPorId);
+router.get('/lojas/:id', storeController.getStoreById);
 
 /**
  * @swagger
@@ -88,7 +88,7 @@ router.get('/lojas/:id', lojaController.buscarLojaPorId);
  *       404:
  *         description: Loja não encontrada
  */
-router.delete('/lojas/:id', lojaController.excluirLoja);
+router.delete('/lojas/:id', storeController.deleteStore);
 
 /**
  * @swagger
@@ -99,7 +99,7 @@ router.delete('/lojas/:id', lojaController.excluirLoja);
  *       200:
  *         description: Todas as lojas foram excluídas
  */
-router.delete('/lojas', lojaController.excluirTodasLojas);
+router.delete('/lojas', storeController.deleteAllStores);
 
 /**
  * @swagger
@@ -148,7 +148,7 @@ router.delete('/lojas', lojaController.excluirTodasLojas);
  *       400:
  *         description: Erro de validação dos dados
  */
-router.post('/lojas', lojaController.criarLoja);
+router.post('/lojas', storeController.createStore);
 
 /**
  * @swagger
@@ -176,6 +176,6 @@ router.post('/lojas', lojaController.criarLoja);
  *       404:
  *         description: Loja não encontrada
  */
-router.patch('/lojas/:id', lojaController.atualizarLoja);
+router.patch('/lojas/:id', storeController.updateStore);
 
 export default router;

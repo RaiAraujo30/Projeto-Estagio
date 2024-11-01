@@ -1,14 +1,14 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
-import { salvarCoordenadasMiddleware } from '../middlewares/lojaMiddleware';
+import { saveCoordinatesMiddleware } from '../middlewares/storeMiddleware';
 
 // Validar o cep com 8 digitos
-const validarCEP = (cep: string): boolean => {
-    const cepLimpo = cep.replace(/\D/g, "");
-    return /^[0-9]{8}$/.test(cepLimpo);
+const validateZipCode = (cep: string): boolean => {
+    const cleanZipCode  = cep.replace(/\D/g, "");
+    return /^[0-9]{8}$/.test(cleanZipCode);
 };
 
 // Interface para definir os atributos da Loja
-export interface ILoja extends Document {
+export interface IStore extends Document {
     nome: string;
     rua: string;
     numero: string;
@@ -21,7 +21,7 @@ export interface ILoja extends Document {
     __v?: number;   
 }
 
-const LojaSchema: Schema = new Schema({
+const StoreSchema: Schema = new Schema({
     nome: {
         type: String,
         required: true,
@@ -50,7 +50,7 @@ const LojaSchema: Schema = new Schema({
         type: String,
         required: true,
         validate: {
-            validator: validarCEP,
+            validator: validateZipCode,
             message: 'CEP inválido. Deve conter 8 dígitos numéricos.',
         },
     },
@@ -64,8 +64,8 @@ const LojaSchema: Schema = new Schema({
     },
 });
 
-LojaSchema.pre('save', salvarCoordenadasMiddleware);
+StoreSchema.pre('save', saveCoordinatesMiddleware);
 
-export const Loja: Model<ILoja> = mongoose.model<ILoja>('Loja', LojaSchema);
+export const Store: Model<IStore> = mongoose.model<IStore>('Store', StoreSchema);
 
 

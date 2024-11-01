@@ -1,12 +1,12 @@
 import axios from "axios";
 import "jest";
-import { obterCoordenadasPorCEP } from "./GeoCoding";
+import { getCoordinatesByZipCode } from "./GeoCoding";
 
 // Jest cria um mock da biblioteca axios, permitindo simular chamadas http
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>; // mockedAxios é uma versão simulada do axios
 
-describe("obterCoordenadasPorCEP", () => {
+describe("getCoordinatesByZipCode", () => {
   it("deve retornar coordenadas ao fornecer um CEP valido", async () => {
     // Simulação da resposta da API ViaCEP com dados completos
     mockedAxios.get.mockResolvedValueOnce({
@@ -41,8 +41,8 @@ describe("obterCoordenadasPorCEP", () => {
       },
     });
 
-    const coordenadas = await obterCoordenadasPorCEP("55014-490");
-    expect(coordenadas).toEqual({ latitude: -8.2621303, longitude: -35.983059});
+    const coordinates = await getCoordinatesByZipCode("55014-490");
+    expect(coordinates).toEqual({ latitude: -8.2621303, longitude: -35.983059});
   });
 
   it("deve lançar um erro se a API do ViaCEP retornar informações insuficientes", async () => {
@@ -63,7 +63,7 @@ describe("obterCoordenadasPorCEP", () => {
     });
 
     // Espera-se que a função lance um erro específico devido à falta de informações completas no retorno
-    await expect(obterCoordenadasPorCEP("55014-490")).rejects.toThrow(
+    await expect(getCoordinatesByZipCode("55014-490")).rejects.toThrow(
       "Não foi possível encontrar o endereço completo para o CEP informado."
     );
   });

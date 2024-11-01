@@ -29,12 +29,12 @@ interface GeocodingResponse {
   }[];
 }
 
-interface Coordenadas {
+interface Coordinates  {
   latitude: number;
   longitude: number;
 }
 
-async function buscarEnderecoViaCep(cep: string): Promise<ViaCepResponse> {
+async function fetchAddressViaCep(cep: string): Promise<ViaCepResponse> {
   const { data }: AxiosResponse<ViaCepResponse> = await axios.get(
     `https://viacep.com.br/ws/${cep}/json/`
   );
@@ -50,12 +50,12 @@ async function buscarEnderecoViaCep(cep: string): Promise<ViaCepResponse> {
   return data;
 }
 
-async function buscarCoordenadas(endereco: string): Promise<GeocodingResponse> {
+async function fetchCoordinates(address: string): Promise<GeocodingResponse> {
   const { data }: AxiosResponse<GeocodingResponse> = await axios.get(
     "https://api.opencagedata.com/geocode/v1/json",
     {
       params: {
-        q: endereco,
+        q: address,
         key: API_KEY,
         countrycode: "br",
         limit: 1,
@@ -65,27 +65,27 @@ async function buscarCoordenadas(endereco: string): Promise<GeocodingResponse> {
 
   return data;
 }
-export async function obterCoordenadasPorCEP(
+export async function getCoordinatesByZipCode(
   cep: string
-): Promise<Coordenadas> {
+): Promise<Coordinates> {
   try {
-    const dados = await buscarEnderecoViaCep(cep);
-    const enderecoCompleto = `${dados.logradouro}, ${dados.bairro}, ${dados.localidade}, ${dados.uf}, Brasil`;
+    const addressData  = await fetchAddressViaCep(cep);
+    const fullAddress  = `${addressData.logradouro}, ${addressData.bairro}, ${addressData.localidade}, ${addressData.uf}, Brasil`;
 
-    logger.info(`Buscando coordenadas para o endereço: ${enderecoCompleto}`);
-    let response = await buscarCoordenadas(enderecoCompleto);
+    logger.info(`Buscando coordenadas para o endereço: ${fullAddress}`);
+    let response = await fetchCoordinates(fullAddress);
 
     if (response.results.length === 0) {
-      const enderecoSimplificado = `${dados.bairro}, ${dados.localidade}, ${dados.uf}, Brasil`;
+      const simplifiedAddress  = `${addressData.bairro}, ${addressData.localidade}, ${addressData.uf}, Brasil`;
       logger.warn(
-        `Nenhuma coordenada exata encontrada, tentando busca com cidade e bairro: ${enderecoSimplificado}`
+        `Nenhuma coordenada exata encontrada, tentando busca com cidade e bairro: ${simplifiedAddress}`
       );
 
-      response = await buscarCoordenadas(enderecoSimplificado);
+      response = await fetchCoordinates(simplifiedAddress);
 
       if (response.results.length === 0) {
         logger.error(
-          `Nenhuma coordenada encontrada para o endereço simplificado: ${enderecoSimplificado}`
+          `Nenhuma coordenada encontrada para o endereço simplificado: ${simplifiedAddress}`
         );
         throw new AppError(
           "Nenhuma coordenada encontrada para o endereço informado.",
