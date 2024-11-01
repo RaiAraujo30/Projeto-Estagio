@@ -1,4 +1,4 @@
-function calcularDistancia(
+function calculateDistance(
     lat1: number,
     lon1: number,
     lat2: number,
@@ -14,8 +14,8 @@ function calcularDistancia(
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distancia =  R * c; //distância em km
-    return parseFloat(distancia.toFixed(2));
+    const distance =  R * c; //distância em km
+    return parseFloat(distance.toFixed(2));
   }
 
-export default calcularDistancia;
+export default calculateDistance;
