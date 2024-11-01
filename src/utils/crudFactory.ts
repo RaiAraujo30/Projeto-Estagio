@@ -8,7 +8,7 @@ export const deleteOne = <T extends Document>(Model: Model<T>) =>
     const doc = await Model.findByIdAndDelete(req.params.id);
 
     if (!doc) {
-      return next(new AppError("No document found with that ID", 404));
+      return next(new AppError("Nenhum documento encontrado com esse ID", 404));
     }
 
     res.status(204).json({
@@ -34,7 +34,7 @@ export const updateOne = <T extends Document>(Model: Model<T>) =>
     });
 
     if (!doc) {
-      return next(new AppError("No document found with that ID", 404));
+      return next(new AppError("Nenhum documento encontrado com esse ID", 404));
     }
 
     res.status(200).json({
@@ -54,7 +54,7 @@ export const getOne = <T extends Document>(
     const doc = await query;
 
     if (!doc) {
-      return next(new AppError("No document found with that ID", 404));
+      return next(new AppError("Nenhum documento encontrado com esse ID", 404));
     }
 
     res.status(200).json({
@@ -78,11 +78,11 @@ export const deleteAll = <T extends Document>(Model: Model<T>) =>
     const result = await Model.deleteMany({});
 
     if (result.deletedCount === 0) {
-      return next(new AppError("No documents found to delete", 404));
+      return next(new AppError("Nenhum documento encontrado", 404));
     }
 
     res.status(200).json({
       status: "success",
-      message: `${result.deletedCount} documents were deleted.`,
+      message: `${result.deletedCount} documentos foram excluidos.`,
     });
   });

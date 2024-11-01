@@ -77,7 +77,7 @@ describe("CRUD Controller", () => {
     await deleteAll(ModelMock as Model<Document>)(req as Request, res as Response, next);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ status: "success", message: "1 documents were deleted." });
+    expect(res.json).toHaveBeenCalledWith({ status: "success", message: "1 documentos foram excluidos." });
   });
 
   it("deve retornar erro se nenhum documento for deletado com deleteAll", async () => {
