@@ -50,7 +50,6 @@ const LojaSchema: Schema = new Schema({
         type: String,
         required: true,
         validate: {
-            //TODO: Adicionar no Middleware
             validator: validarCEP,
             message: 'CEP inválido. Deve conter 8 dígitos numéricos.',
         },

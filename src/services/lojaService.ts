@@ -7,7 +7,8 @@ export const lojaService = {
   async buscarLojasPorCEP(cep: string): Promise<any> {
     try {
       // Verificar se o CEP é válido
-      if (!/^\d{5}-?\d{3}$/.test(cep)) {
+      const cepValidado = validarCEP(cep);
+      if (!cepValidado) {
         logger.info(`CEP inválido: ${cep}`);
         return "CEP inválido, deve possuir 8 digitos numéricos.";
       }
@@ -18,34 +19,15 @@ export const lojaService = {
         return "Coordenadas não encontradas para o CEP informado.";
       }
 
-      const { latitude: lat1, longitude: lon1 } = coordenadas;
-
-      logger.info(`Buscando lojas em um raio de 100km para o cep informado`);
       const lojas = await Loja.find();
-
+      
       if (!lojas || lojas.length === 0) {
         logger.info("Nenhuma loja encontrada no banco de dados.");
         return "Nenhuma loja disponível no banco de dados.";
       }
-
-      const lojasProximas = lojas
-        .map((loja) => {
-          if (!loja.latitude || !loja.longitude) {
-            return null; // se por acaso não houver long e lat na loja ela é ignorada
-          }
-
-          const distancia = calcularDistancia(
-            lat1,
-            lon1,
-            loja.latitude,
-            loja.longitude
-          );
-          const { _id,__v,  ...lojaSemIdEV } = loja.toObject();
-          return { ...lojaSemIdEV, distancia }; // adiciona distancia ao objeto loja
-        })
-        .filter((loja): loja is NonNullable<typeof loja> => loja !== null) // Filtra lojas não nulas
-        .filter((loja) => loja.distancia <= 100)
-        .sort((a, b) => a.distancia - b.distancia);
+      
+      logger.info(`Buscando lojas em um raio de 100km para o cep informado`);
+      const lojasProximas = filtrarLojasPorProximidade(lojas, coordenadas, 100);
 
       if (lojasProximas.length === 0) {
         logger.info(`Nenhuma loja encontrada próxima ao CEP: ${cep}`);
@@ -66,3 +48,29 @@ export const lojaService = {
     }
   },
 };
+
+
+function validarCEP(cep: string): boolean {
+  return /^\d{5}-?\d{3}$/.test(cep);
+}
+
+function filtrarLojasPorProximidade(
+  lojas: any[],
+  coordenadas: { latitude: number; longitude: number },
+  raio: number
+) {
+  const { latitude: lat1, longitude: lon1 } = coordenadas;
+
+  return lojas
+    .reduce((proximas, loja) => {
+      if (loja.latitude && loja.longitude) {
+        const distancia = calcularDistancia(lat1, lon1, loja.latitude, loja.longitude);
+        if (distancia <= raio) {
+          const { _id, __v, ...lojaSemIdEV } = loja.toObject();
+          proximas.push({ ...lojaSemIdEV, distancia });
+        }
+      }
+      return proximas;
+    }, [])
+    .sort((a: { distancia: number; }, b: { distancia: number; }) => a.distancia - b.distancia);
+}

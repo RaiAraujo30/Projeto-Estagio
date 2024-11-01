@@ -49,20 +49,6 @@ async function buscarEnderecoViaCep(cep: string): Promise<ViaCepResponse> {
 
   return data;
 }
-// EXEMPLO:
-// cep: '55014-490',
-// logradouro: 'Rua São Rafael',
-// complemento: '',
-// unidade: '',
-// bairro: aru',
-// localidade: 'Caruaru''Nova Caru,
-// uf: 'PE',
-// estado: 'Pernambuco',
-// regiao: 'Nordeste',
-// ibge: '2604106',
-// gia: '',
-// ddd: '81',
-// siafi: '2381'
 
 async function buscarCoordenadas(endereco: string): Promise<GeocodingResponse> {
   const { data }: AxiosResponse<GeocodingResponse> = await axios.get(
