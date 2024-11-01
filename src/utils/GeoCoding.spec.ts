@@ -1,5 +1,6 @@
 import axios from "axios";
-import { obterCoordenadasPorCEP } from "../utils/GeoCoding";
+import "jest";
+import { obterCoordenadasPorCEP } from "./GeoCoding";
 
 // Jest cria um mock da biblioteca axios, permitindo simular chamadas http
 jest.mock("axios");
@@ -13,9 +14,12 @@ describe("obterCoordenadasPorCEP", () => {
         cep: "55014-490",
         logradouro: "Rua São Rafael",
         complemento: "",
+        unidade: '',
         bairro: "Nova Caruaru",
         localidade: "Caruaru",
         uf: "PE",
+        estado: 'Pernambuco',
+        regiao: 'Nordeste',
         ibge: "2604106",
         gia: "",
         ddd: "81",
@@ -29,8 +33,8 @@ describe("obterCoordenadasPorCEP", () => {
         results: [
           {
             geometry: {
-              lat: -8.2833,
-              lng: -35.975,
+              lat: -8.2621303,
+              lng: -35.983059,
             },
           },
         ],
@@ -38,7 +42,7 @@ describe("obterCoordenadasPorCEP", () => {
     });
 
     const coordenadas = await obterCoordenadasPorCEP("55014-490");
-    expect(coordenadas).toEqual({ latitude: -8.2833, longitude: -35.975 });
+    expect(coordenadas).toEqual({ latitude: -8.2621303, longitude: -35.983059});
   });
 
   it("deve lançar um erro se a API do ViaCEP retornar informações insuficientes", async () => {

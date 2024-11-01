@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Model, Document } from "mongoose";
-import catchAsync from "../utils/catchAsync";
-import AppError from "../utils/AppError";
+import catchAsync from "../middlewares/catchAsync";
+import AppError from "./AppError";
 
 export const deleteOne = <T extends Document>(Model: Model<T>) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {

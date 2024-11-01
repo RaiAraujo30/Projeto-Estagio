@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
+import { salvarCoordenadasMiddleware } from '../middlewares/lojaMiddleware';
 
 // Validar o cep com 8 digitos
 const validarCEP = (cep: string): boolean => {
@@ -17,6 +18,7 @@ export interface ILoja extends Document {
     cep: string;
     latitude: number;
     longitude: number;
+    __v?: number;   
 }
 
 const LojaSchema: Schema = new Schema({
@@ -54,13 +56,15 @@ const LojaSchema: Schema = new Schema({
     },
     latitude: {
         type: Number,
-        required: true,
+        
     },
     longitude: {
         type: Number,
-        required: true,
+        
     },
 });
+
+LojaSchema.pre('save', salvarCoordenadasMiddleware);
 
 export const Loja: Model<ILoja> = mongoose.model<ILoja>('Loja', LojaSchema);
 
