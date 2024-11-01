@@ -3,17 +3,179 @@ import * as lojaController from '../controllers/lojaController';
 
 const router = express.Router();
 
-// Rota do desafio 
+/**
+ * @swagger
+ * /api/lojas/buscar/{cep}:
+ *   get:
+ *     summary: Busca lojas próximas a um CEP em um raio de 100km
+ *     parameters:
+ *       - in: path
+ *         name: cep
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: O CEP para buscar as lojas próximas
+ *     responses:
+ *       200:
+ *         description: Lista de lojas próximas ao CEP
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       404:
+ *         description: Nenhuma loja encontrada para o CEP fornecido
+ */
 router.get('/lojas/buscar/:cep', lojaController.buscarLojasPorCEP);
 
-// Rotas do CRUD
+/**
+ * @swagger
+ * /api/lojas:
+ *   get:
+ *     summary: Lista todas as lojas
+ *     responses:
+ *       200:
+ *         description: Lista de todas as lojas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ */
 router.get('/lojas', lojaController.listarLojas);
-router.get('/lojas/:id', lojaController.buscarLojaPorId);
-router.delete('/lojas/:id', lojaController.excluirLoja);
-router.delete('/lojas', lojaController.excluirTodasLojas);
-router.post('/lojas', lojaController.criarLoja);
-router.patch('/lojas/:id', lojaController.atualizarLoja);
 
-//a rota fica 127.0.0.1:3000/api/lojas/...
+/**
+ * @swagger
+ * /api/lojas/{id}:
+ *   get:
+ *     summary: Busca uma loja pelo ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Indique o ID da loja
+ *     responses:
+ *       200:
+ *         description: Dados da loja encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       404:
+ *         description: Loja não encontrada
+ */
+router.get('/lojas/:id', lojaController.buscarLojaPorId);
+
+/**
+ * @swagger
+ * /api/lojas/{id}:
+ *   delete:
+ *     summary: Exclui uma loja pelo ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: O ID da loja
+ *     responses:
+ *       200:
+ *         description: Loja excluída com sucesso
+ *       404:
+ *         description: Loja não encontrada
+ */
+router.delete('/lojas/:id', lojaController.excluirLoja);
+
+/**
+ * @swagger
+ * /api/lojas:
+ *   delete:
+ *     summary: Exclui todas as lojas
+ *     responses:
+ *       200:
+ *         description: Todas as lojas foram excluídas
+ */
+router.delete('/lojas', lojaController.excluirTodasLojas);
+
+/**
+ * @swagger
+ * /api/lojas:
+ *   post:
+ *     summary: Cria uma nova loja
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *                 description: Nome da loja
+ *               rua:
+ *                 type: string
+ *                 description: Nome da rua onde a loja está localizada
+ *               numero:
+ *                 type: string
+ *                 description: Número do endereço da loja
+ *               bairro:
+ *                 type: string
+ *                 description: Bairro onde a loja está localizada
+ *               cidade:
+ *                 type: string
+ *                 description: Cidade onde a loja está localizada
+ *               estado:
+ *                 type: string
+ *                 description: Estado onde a loja está localizada
+ *               cep:
+ *                 type: string
+ *                 description: Código postal (CEP) da loja
+ *               latitude:
+ *                 type: number
+ *                 format: float
+ *                 description: Latitude da localização da loja
+ *               longitude:
+ *                 type: number
+ *                 format: float
+ *                 description: Longitude da localização da loja
+ *     responses:
+ *       201:
+ *         description: Loja criada com sucesso
+ *       400:
+ *         description: Erro de validação dos dados
+ */
+router.post('/lojas', lojaController.criarLoja);
+
+/**
+ * @swagger
+ * /api/lojas/{id}:
+ *   patch:
+ *     summary: Atualiza os dados de uma loja pelo ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: O ID da loja
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               
+ *     responses:
+ *       200:
+ *         description: Loja atualizada com sucesso
+ *       404:
+ *         description: Loja não encontrada
+ */
+router.patch('/lojas/:id', lojaController.atualizarLoja);
 
 export default router;

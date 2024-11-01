@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import routes from "./routes";
 import connectDB from "./db/database";
 import logger from "./utils/logger";
-import errorController from "./controllers/errorController"; // Importar o errorController
+import errorController from "./controllers/errorController"; 
+import { setupSwagger } from "./utils/swaggerConfig";
 
 //Carrega variáveis do .env
 dotenv.config();
@@ -13,6 +14,7 @@ connectDB();
 const app: Application = express();
 const port: string | number = process.env.PORT || 3000;
 
+setupSwagger(app);
 // Middleware para parsing de JSON
 app.use(express.json());
 

@@ -17,6 +17,7 @@ export interface ILoja extends Document {
     cep: string;
     latitude: number;
     longitude: number;
+    __v?: number;
 }
 
 const LojaSchema: Schema = new Schema({

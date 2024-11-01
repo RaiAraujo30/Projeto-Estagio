@@ -4,10 +4,6 @@ import logger from "../utils/logger";
 import calcularDistancia  from "../utils/Haversine";
 
 export const lojaService = {
-  async excluirTodasLojas(): Promise<{ deletedCount?: number }> {
-    return await Loja.deleteMany({});
-  },
-
   async buscarLojasPorCEP(cep: string): Promise<any> {
     try {
       // Verificar se o CEP é válido
@@ -43,7 +39,8 @@ export const lojaService = {
             loja.latitude,
             loja.longitude
           );
-          return { ...loja.toObject(), distancia }; // adiciona distancia ao objeto loja
+          const { _id, __v, ...lojaSemIdEV } = loja.toObject();
+          return { ...lojaSemIdEV, distancia }; // adiciona distancia ao objeto loja
         })
         .filter((loja): loja is NonNullable<typeof loja> => loja !== null) // Filtra lojas não nulas
         .filter((loja) => loja.distancia <= 100)
