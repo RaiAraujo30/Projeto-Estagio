@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 import routes from "./routes";
 import connectDB from "./db/database";
 import logger from "./utils/logger";
-import errorController from "./controllers/errorController"; 
-import { setupSwagger } from "./utils/swaggerConfig";
+import errorController from "./middlewares/errorController"; 
+import { setupSwagger } from "./config/swaggerConfig";
 
 //Carrega variáveis do .env
 dotenv.config();
